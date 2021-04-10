@@ -10,6 +10,8 @@ public class RobotController : MonoBehaviour
     Rigidbody2D rb;
     AudioSource audioSource;
     CircleCollider2D col;
+    SpriteRenderer sr;
+    MeshRenderer vision;
 
     public float speed;
 
@@ -19,6 +21,8 @@ public class RobotController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
         col = GetComponent<CircleCollider2D>();
+        sr = GetComponent<SpriteRenderer>();
+        vision = GetComponentInChildren<MeshRenderer>();
     }
 
     void Update()
@@ -26,5 +30,16 @@ public class RobotController : MonoBehaviour
         
     }
 
+    public void Hide()
+    {
+        sr.enabled = false;
+        vision.enabled = false;
+    }
+
+    public void Show()
+    {
+        sr.enabled = true;
+        vision.enabled = true;
+    }
     
 }

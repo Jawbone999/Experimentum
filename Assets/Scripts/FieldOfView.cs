@@ -109,6 +109,11 @@ public class FieldOfView : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, viewRadius, obstacleMask);
         if (hit)
         {
+            if (hit.transform.gameObject.name == "Robot")
+            {
+                hit.transform.gameObject.GetComponent<RobotController>().Show();
+            }
+
             return new ViewCastInfo(true, hit.point, hit.distance, angle);
         }
 
