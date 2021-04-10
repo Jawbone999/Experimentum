@@ -13,14 +13,15 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
     AudioSource audioSource;
     CircleCollider2D col;
-
-    public AudioClip footstepClip;
+    public SpriteRenderer body;
+    SpriteRenderer legs;
 
     public float walkSpeed;
     public float runSpeed;
 
     public bool canMove;
     public bool isRunning;
+    public bool isMoving;
     public int xMovement; // 0 for none, -1 for left, +1 for right
     public int yMovement; // 0 for none, -1 for down, +1 for up
 
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
         col = GetComponent<CircleCollider2D>();
+        legs = GetComponent<SpriteRenderer>();
     }
 
     void Start()
@@ -84,20 +86,29 @@ public class PlayerController : MonoBehaviour
         {
             isRunning = true;
         }
+
+        isMoving = xMovement != 0 || yMovement != 0;
     }
 
     void TurnInput()
     {
         Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, camController.cameraZoom);
         Vector3 worldPos = camController.cam.ScreenToWorldPoint(mousePos);
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, worldPos - transform.position);
+        body.transform.rotation = Quaternion.LookRotation(Vector3.forward, worldPos - transform.position);
     }
 
     void Animate()
     {
-        bool isMoving = xMovement != 0 || yMovement != 0;
         animator.SetBool("moving", isMoving);
         animator.SetBool("running", isRunning);
+    }
+    
+    public void PlayFootstepSound()
+    {
+        audioSource.pitch = Random.Range(0.9f, 1);
+        audioSource.volume = Random.Range(0.4f, 0.5f);
+
+        audioSource.Play();
     }
 
     void FixedUpdate()
@@ -109,6 +120,11 @@ public class PlayerController : MonoBehaviour
 
         float speed = isRunning ? runSpeed : walkSpeed;
         Vector3 move = new Vector3(speed * Time.deltaTime * xMovement, speed * Time.deltaTime * yMovement, 0);
-        rb.MovePosition(transform.position + move);
+
+        if (move != Vector3.zero)
+        {
+            rb.MovePosition(transform.position + move);
+            legs.transform.rotation = Quaternion.AngleAxis(Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg + 90, Vector3.forward);
+        }
     }
 }
