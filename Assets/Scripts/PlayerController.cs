@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
 {
     public CameraController camController;
 
-    SpriteRenderer spriteRenderer;
+    Animator animator;
     Rigidbody2D rb;
     AudioSource audioSource;
     CircleCollider2D col;
@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
         col = GetComponent<CircleCollider2D>();
@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     {
         MovementInput();
         TurnInput();
+        Animate();
     }
 
     void ResetMovement()
@@ -90,6 +91,13 @@ public class PlayerController : MonoBehaviour
         Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, camController.cameraZoom);
         Vector3 worldPos = camController.cam.ScreenToWorldPoint(mousePos);
         transform.rotation = Quaternion.LookRotation(Vector3.forward, worldPos - transform.position);
+    }
+
+    void Animate()
+    {
+        bool isMoving = xMovement != 0 || yMovement != 0;
+        animator.SetBool("moving", isMoving);
+        animator.SetBool("running", isRunning);
     }
 
     void FixedUpdate()
