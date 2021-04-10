@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour
         this.GetCamFollowPosition = GetCamFollowPosition;
     }
 
-    void Update()
+    void LateUpdate()
     {
         transform.position = GetCamFollowPosition() + (Vector3.forward * cameraZoom);
     }
