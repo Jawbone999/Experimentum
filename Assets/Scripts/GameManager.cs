@@ -10,6 +10,11 @@ public class GameManager : MonoBehaviour
 
     public LayerMask obstacleMask;
 
+    public AudioSource backgroundMusicPlayer;
+    public AudioSource stingPlayer;
+    public float stingCooldown;
+    float lastSting;
+
     void Awake()
     {
         // Remove Scene View Mask
@@ -40,6 +45,8 @@ public class GameManager : MonoBehaviour
         {
             robots.Add(rcs[i]);
         }
+
+        lastSting = Time.time - stingCooldown;
     }
 
     void FixedUpdate()
@@ -47,6 +54,15 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < robots.Count; i++)
         {
             robots[i].GetComponent<RobotController>().Hide();
+        }
+    }
+
+    public void PlaySting()
+    {
+        if (Time.time - lastSting >= stingCooldown)
+        {
+            stingPlayer.Play();
+            lastSting = Time.time;
         }
     }
 }

@@ -10,6 +10,7 @@ public class FieldOfView : MonoBehaviour
     public float viewAngle;
 
     public LayerMask obstacleMask;
+    public LayerMask triggerMask;
 
     public float meshResolution;
     public int edgeResolveIterations;
@@ -35,9 +36,14 @@ public class FieldOfView : MonoBehaviour
         viewMeshFilter.mesh = viewMesh;
     }
 
-    void LateUpdate()
+    public void SetObstacleMask(LayerMask mask)
     {
-        DrawFieldOfView();
+        obstacleMask = mask;
+    }
+
+    public void SetTriggerMask(LayerMask mask)
+    {
+        triggerMask = mask;
     }
 
     Vector3 DirFromAngle(float angleInDegrees)
@@ -45,8 +51,10 @@ public class FieldOfView : MonoBehaviour
         return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), Mathf.Cos(angleInDegrees * Mathf.Deg2Rad), 0);
     }
 
-    void DrawFieldOfView()
+    public Vector3 DrawFieldOfView()
     {
+        Vector3 targetPoint = Vector3.zero;
+
         int stepCount = Mathf.RoundToInt(viewAngle * meshResolution);
         float stepAngleSize = viewAngle / stepCount;
         List<Vector3> viewPoints = new List<Vector3>();
@@ -77,6 +85,11 @@ public class FieldOfView : MonoBehaviour
             
             viewPoints.Add(newViewCast.point);
             oldViewCast = newViewCast;
+
+            if (targetPoint == Vector3.zero && triggerMask == (triggerMask| (1 << newViewCast.layer)))
+            {
+                targetPoint = newViewCast.point;
+            }
         }
 
         int vertexCount = viewPoints.Count + 1;
@@ -101,6 +114,8 @@ public class FieldOfView : MonoBehaviour
         viewMesh.vertices = vertices;
         viewMesh.triangles = triangles;
         viewMesh.RecalculateNormals();
+
+        return targetPoint;
     }
 
     ViewCastInfo ViewCast(float angle)
@@ -114,10 +129,10 @@ public class FieldOfView : MonoBehaviour
                 hit.transform.gameObject.GetComponent<RobotController>().Show();
             }
 
-            return new ViewCastInfo(true, hit.point, hit.distance, angle);
+            return new ViewCastInfo(true, hit.transform.gameObject.layer, hit.point, hit.distance, angle);
         }
 
-        return new ViewCastInfo(false, transform.position + dir * viewRadius, viewRadius, angle);
+        return new ViewCastInfo(false, -1, transform.position + dir * viewRadius, viewRadius, angle);
     }
 
     EdgeInfo FindEdge(ViewCastInfo minViewCast, ViewCastInfo maxViewCast)
@@ -150,29 +165,31 @@ public class FieldOfView : MonoBehaviour
     void OnDrawGizmos()
     {
         // Draw view radius
-        Matrix4x4 oldMatrix = Gizmos.matrix;
-        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, new Vector3(1, 1, 0.01f));
-        Gizmos.DrawWireSphere(Vector3.zero, viewRadius);
-        Gizmos.matrix = oldMatrix;
+        // Matrix4x4 oldMatrix = Gizmos.matrix;
+        // Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, new Vector3(1, 1, 0.01f));
+        // Gizmos.DrawWireSphere(Vector3.zero, viewRadius);
+        // Gizmos.matrix = oldMatrix;
 
         // Draw view angle lines
-        float halfAngle = viewAngle / 2f;
-        Vector3 angleA = DirFromAngle(-halfAngle - transform.eulerAngles.z);
-        Vector3 angleB = DirFromAngle(halfAngle - transform.eulerAngles.z);
-        Gizmos.DrawLine(transform.position, transform.position + angleA * viewRadius);
-        Gizmos.DrawLine(transform.position, transform.position + angleB * viewRadius);
+        // float halfAngle = viewAngle / 2f;
+        // Vector3 angleA = DirFromAngle(-halfAngle - transform.eulerAngles.z);
+        // Vector3 angleB = DirFromAngle(halfAngle - transform.eulerAngles.z);
+        // Gizmos.DrawLine(transform.position, transform.position + angleA * viewRadius);
+        // Gizmos.DrawLine(transform.position, transform.position + angleB * viewRadius);
     }
 
     public struct ViewCastInfo
     {
         public bool hit;
+        public int layer;
         public Vector3 point;
         public float distance;
         public float angle;
 
-        public ViewCastInfo(bool _hit, Vector3 _point, float _distance, float _angle)
+        public ViewCastInfo(bool _hit, int _layer, Vector3 _point, float _distance, float _angle)
         {
             hit = _hit;
+            layer = _layer;
             point = _point;
             distance = _distance;
             angle = _angle;

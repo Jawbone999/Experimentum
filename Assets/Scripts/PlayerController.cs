@@ -15,9 +15,12 @@ public class PlayerController : MonoBehaviour
     CircleCollider2D col;
     public SpriteRenderer body;
     SpriteRenderer legs;
+    FieldOfView fov;
+    GameManager gm;
 
     public float walkSpeed;
     public float runSpeed;
+    public int hitPoints;
 
     public bool canMove;
     public bool isRunning;
@@ -32,11 +35,18 @@ public class PlayerController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         col = GetComponent<CircleCollider2D>();
         legs = GetComponent<SpriteRenderer>();
+        fov = GetComponentInChildren<FieldOfView>();
+        gm = GameObject.FindObjectOfType<GameManager>();
     }
 
     void Start()
     {
         camController.Setup(() => transform.position);
+        LayerMask enemies = 1 << 10;
+        fov.SetTriggerMask(enemies);
+
+        LayerMask walls = 1 << 7 | 1 << 10;
+        fov.SetObstacleMask(walls);
     }
 
     void Update()
@@ -44,6 +54,16 @@ public class PlayerController : MonoBehaviour
         MovementInput();
         TurnInput();
         Animate();
+    }
+
+    void LateUpdate()
+    {
+        Vector3 enemy = fov.DrawFieldOfView();
+
+        if (enemy != Vector3.zero)
+        {
+            gm.PlaySting();
+        }
     }
 
     void ResetMovement()
@@ -126,5 +146,11 @@ public class PlayerController : MonoBehaviour
             rb.MovePosition(transform.position + move);
             legs.transform.rotation = Quaternion.AngleAxis(Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg + 90, Vector3.forward);
         }
+    }
+
+    public void Hurt()
+    {
+        Debug.Log("ow!");
+        hitPoints -= 1;
     }
 }
