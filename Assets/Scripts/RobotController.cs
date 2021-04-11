@@ -24,6 +24,8 @@ public class RobotController : MonoBehaviour
     float hitWaitTime;
     public float hitCooldown;
     public Difficulty difficulty;
+    public NavNode currentNode;
+    public NavNode nextNode;
 
     public float distanceTolerance;
     public bool isTouchingPlayer;
@@ -92,8 +94,38 @@ public class RobotController : MonoBehaviour
         }
         else
         {
-            
+            if (nextNode)
+            {
+                MoveTowards(nextNode.transform.position);
+                if (IsNear(nextNode.transform.position))
+                {
+                    currentNode = nextNode;
+                }
+            }
+            else
+            {
+                if (IsNear(currentNode.transform.position))
+                {
+                    nextNode = currentNode.next;
+                }
+                else
+                {
+                    MoveTowards(currentNode.transform.position);
+                }
+            }
         }
+
+        if (currentNode == nextNode)
+        {
+            nextNode = currentNode.next;
+        }
+    }
+
+    bool IsNear(Vector3 pos)
+    {
+        Vector3 dist = new Vector3(Mathf.Abs(transform.position.x - pos.x), Mathf.Abs(transform.position.y - pos.y));
+
+        return (dist.x < distanceTolerance && dist.y < distanceTolerance);
     }
 
     void MoveTowards(Vector3 pos)
