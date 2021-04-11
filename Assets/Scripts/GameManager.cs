@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     public List<RobotController> robots;
+    public List<SpriteRenderer> crates;
     public PlayerController player;
 
     public LayerMask obstacleMask;
@@ -46,6 +47,13 @@ public class GameManager : MonoBehaviour
             robots.Add(rcs[i]);
         }
 
+        GameObject crateParent = GameObject.Find("Boxes");
+        SpriteRenderer[] spl = crateParent.GetComponentsInChildren<SpriteRenderer>();
+        for (int i = 0; i < spl.Length; i++)
+        {
+            crates.Add(spl[i]);
+        }
+
         lastSting = Time.time - stingCooldown;
     }
 
@@ -54,6 +62,11 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < robots.Count; i++)
         {
             robots[i].GetComponent<RobotController>().Hide();
+        }
+
+        for (int i = 0; i < crates.Count; i++)
+        {
+            crates[i].enabled = false;
         }
     }
 

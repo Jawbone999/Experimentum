@@ -129,6 +129,11 @@ public class FieldOfView : MonoBehaviour
                 hit.transform.gameObject.GetComponent<RobotController>().Show();
             }
 
+            if (hit.transform.gameObject.name == "Box")
+            {
+                hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled = true;
+            }
+
             return new ViewCastInfo(true, hit.transform.gameObject.layer, hit.point, hit.distance, angle);
         }
 
