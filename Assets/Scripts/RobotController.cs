@@ -8,7 +8,9 @@ public class RobotController : MonoBehaviour
 {
     Animator animator;
     Rigidbody2D rb;
-    AudioSource audioSource;
+    public AudioSource audioSource;
+    public AudioSource effectSource;
+    public AudioSource vocalSource;
     CircleCollider2D col;
     SpriteRenderer sr;
     MeshRenderer vision;
@@ -25,13 +27,15 @@ public class RobotController : MonoBehaviour
 
     public float distanceTolerance;
     public bool isTouchingPlayer;
+
+    public float vocalCooldown;
+    public float vocalWaitTime;
     
 
     void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
-        audioSource = GetComponent<AudioSource>();
         col = GetComponent<CircleCollider2D>();
         sr = GetComponent<SpriteRenderer>();
         vision = GetComponentInChildren<MeshRenderer>();
@@ -43,6 +47,16 @@ public class RobotController : MonoBehaviour
         fov.SetObstacleMask(1 << 7 | 1 << 8);
         fov.SetTriggerMask(1 << 8);
         fov.viewRadius = difficulty.viewRange;
+    }
+
+    void Update()
+    {
+        if (vocalWaitTime <= 0 && Random.Range(0, 1000) < 1)
+        {
+            vocalWaitTime = vocalCooldown;
+            vocalSource.Play();
+        }
+        vocalWaitTime -= Time.deltaTime;
     }
 
     void LateUpdate()
@@ -124,6 +138,7 @@ public class RobotController : MonoBehaviour
             if (hitWaitTime <= 0)
             {
                 collision.gameObject.GetComponent<PlayerController>().Hurt();
+                effectSource.Play();
                 hitWaitTime = hitCooldown;
             }
         }
@@ -142,7 +157,7 @@ public class RobotController : MonoBehaviour
         animator.SetBool("isMoving", xMovement != 0 || yMovement != 0);
     }
 
-    void PlayFootstepSound()
+    public void PlayFootstepSound()
     {
         audioSource.pitch = Random.Range(1f, 1.1f);
         audioSource.volume = Random.Range(0.4f, 0.5f);

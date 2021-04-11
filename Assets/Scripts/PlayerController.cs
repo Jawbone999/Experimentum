@@ -150,7 +150,11 @@ public class PlayerController : MonoBehaviour
 
     public void Hurt()
     {
-        Debug.Log("ow!");
         hitPoints -= 1;
+
+        if (hitPoints == 0)
+        {
+            canMove = false;
+        }
     }
 }
