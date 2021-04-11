@@ -1,3 +1,3 @@
 # Experimentum
 
-![Experimentum](images/logo.png)
+![Experimentum](images/Experimentum.png)
