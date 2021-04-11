@@ -796,6 +796,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 22858320}
     - target: {fileID: 2930743144787331458, guid: 5126fe948f8bcc9459293d8e493892d9, type: 3}
+      propertyPath: difficulty.speed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930743144787331458, guid: 5126fe948f8bcc9459293d8e493892d9, type: 3}
       propertyPath: difficulty.chaseTime
       value: 5
       objectReference: {fileID: 0}
